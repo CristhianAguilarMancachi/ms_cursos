@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: ms_cursos
+  config:
+    import: "classpath:application-openapi.yml"
+  
+  # Desactivar JPA completamente
+  data:
+    jpa:
+      enabled: false
+  
+  # Desactivar la configuración de datasource
+  datasource:
+    url: # Deja el URL vacío para evitar la configuración de datasource
+    driver-class-name: 
+    username: 
+    password: 
+
+server:
+  port: 7000
+  error:
+    include-message: always
+
+app:
+  product-service:
+    host: localhost
+    port: 7001
+  recommendation-service:
+    host: localhost
+    port: 7002
+  review-service:
+    host: localhost
+    port: 7003
+
+logging:
+  level:
+    root: INFO
+    '[bo.edu.ucb.collas_learning]': DEBUG
