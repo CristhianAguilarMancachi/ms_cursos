@@ -1,12 +1,28 @@
 package bo.edu.ucb.collas_learning.core.ms_cursos.dto;
 
-public class RespuestaDTO {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
+
+public class RespuestaDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private int codRespuesta;
+
+    @NotBlank(message = "La respuesta no puede estar vacía.")
     private String respuesta;
+
     private boolean esCorrecta;
+
+    @Min(value = 1, message = "El código de la pregunta debe ser mayor que 0.")
     private int preguntaCodPregunta;
 
-    // Constructor
+    // Constructor sin parámetros
+    public RespuestaDTO() {
+    }
+
+    // Constructor con parámetros
     public RespuestaDTO(int codRespuesta, String respuesta, boolean esCorrecta, int preguntaCodPregunta) {
         this.codRespuesta = codRespuesta;
         this.respuesta = respuesta;
@@ -45,5 +61,15 @@ public class RespuestaDTO {
 
     public void setPreguntaCodPregunta(int preguntaCodPregunta) {
         this.preguntaCodPregunta = preguntaCodPregunta;
+    }
+
+    @Override
+    public String toString() {
+        return "RespuestaDTO{" +
+                "codRespuesta=" + codRespuesta +
+                ", respuesta='" + respuesta + '\'' +
+                ", esCorrecta=" + esCorrecta +
+                ", preguntaCodPregunta=" + preguntaCodPregunta +
+                '}';
     }
 }

@@ -1,17 +1,41 @@
 package bo.edu.ucb.collas_learning.core.ms_cursos.dto;
 
-public class RespuestaUsuarioDTO {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
+
+public class RespuestaUsuarioDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    // Generalmente generado, por lo que no se valida
     private int codRespuetaUsuario;
+
+    @NotBlank(message = "El texto de la respuesta no puede estar vacío.")
     private String respuestaTexto;
+
+    // Campo boolean, no requiere validación adicional
     private boolean esCorrecta;
+
+    @Min(value = 1, message = "El código de la pregunta debe ser mayor que 0.")
     private int codPregunta;
+
+    @Min(value = 1, message = "El código de la evaluación debe ser mayor que 0.")
     private int codEvaluacion;
+
+    @Min(value = 1, message = "El código de la respuesta debe ser mayor que 0.")
     private int codRespuesta;
+
+    @Min(value = 1, message = "El código de usuario debe ser mayor que 0.")
     private int codUsuario;
 
-    // Constructor
+    // Constructor sin parámetros
+    public RespuestaUsuarioDTO() {
+    }
+
+    // Constructor con parámetros
     public RespuestaUsuarioDTO(int codRespuetaUsuario, String respuestaTexto, boolean esCorrecta, 
-                            int codPregunta, int codEvaluacion, int codRespuesta, int codUsuario) {
+                                int codPregunta, int codEvaluacion, int codRespuesta, int codUsuario) {
         this.codRespuetaUsuario = codRespuetaUsuario;
         this.respuestaTexto = respuestaTexto;
         this.esCorrecta = esCorrecta;
@@ -80,8 +104,14 @@ public class RespuestaUsuarioDTO {
 
     @Override
     public String toString() {
-        return "RespuestaUsuario [codRespuetaUsuario=" + codRespuetaUsuario + ", respuestaTexto=" + respuestaTexto 
-                + ", esCorrecta=" + esCorrecta + ", codPregunta=" + codPregunta + ", codEvaluacion=" + codEvaluacion 
-                + ", codRespuesta=" + codRespuesta + ", codUsuario=" + codUsuario + "]";
+        return "RespuestaUsuarioDTO{" +
+                "codRespuetaUsuario=" + codRespuetaUsuario +
+                ", respuestaTexto='" + respuestaTexto + '\'' +
+                ", esCorrecta=" + esCorrecta +
+                ", codPregunta=" + codPregunta +
+                ", codEvaluacion=" + codEvaluacion +
+                ", codRespuesta=" + codRespuesta +
+                ", codUsuario=" + codUsuario +
+                '}';
     }
 }
