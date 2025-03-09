@@ -17,6 +17,11 @@ public class InscripcionDTO {
         this.codCurso = codCurso;
     }
 
+    public InscripcionDTO(int codInscripcion2, java.sql.Timestamp timestamp, boolean estadoInscripcion2, int idUsuario,
+            int codCurso2) {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getCodInscripcion() {
         return codInscripcion;
     }

@@ -1,121 +1,154 @@
 package bo.edu.ucb.collas_learning.core.ms_cursos.controller;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
-
 import bo.edu.ucb.collas_learning.core.ms_cursos.dto.LeccionDTO;
 import bo.edu.ucb.collas_learning.core.ms_cursos.exception.InvalidInputException;
+import bo.edu.ucb.collas_learning.core.ms_cursos.exception.NotFoundException;
+import bo.edu.ucb.collas_learning.core.ms_cursos.service.ServiceUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-@RequestMapping(value = "/v1/leccion")
-@Tag(name = "leccion", description = "REST API para leccion")
+@RequestMapping("/lecciones")
+@Tag(name = "Lección", description = "REST API para lecciones")
 public class LeccionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeccionController.class);
+    private final ServiceUtil serviceUtil;
 
-    // Constructor vacío, no es necesario el uso de un service en este caso, se está gestionando directamente aquí
-    public LeccionController() {
+    @Autowired
+    public LeccionController(ServiceUtil serviceUtil) {
+        this.serviceUtil = serviceUtil;
     }
 
-    @Operation(summary = "Obtener todas las leccion de un curso", description = "Recupera todas las leccion asociadas a un curso dado su ID.")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "leccion encontradas correctamente."),
-        @ApiResponse(responseCode = "400", description = "ID de curso inválido."),
-        @ApiResponse(responseCode = "404", description = "No se encontraron leccion.") })
-    @GetMapping(value = "/curso/{idCurso}", produces = "application/json")
-    public List<LeccionDTO> getleccionByCursoId(@Parameter(description = "ID del curso al cual pertenecen las leccion", required = true) 
-                                                    @PathVariable int idCurso) {
-        LOGGER.info("Obteniendo leccion para el curso con ID: {}", idCurso);
-
-        if (idCurso < 1) {
-            throw new InvalidInputException("ID de curso inválido: " + idCurso);
+    @Operation(summary = "Obtener todas las lecciones de un curso", 
+               description = "Retorna una lista de lecciones asociadas a un curso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lecciones obtenidas correctamente",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class))),
+            @ApiResponse(responseCode = "400", description = "ID de curso inválido"),
+            @ApiResponse(responseCode = "404", description = "No se encontraron lecciones para el curso")
+    })
+    @GetMapping("/curso/{cursoId}")
+    public List<LeccionDTO> getLeccionesByCurso(
+            @Parameter(description = "ID del curso", required = true)
+            @PathVariable int cursoId) {
+        LOGGER.info("Obteniendo lecciones para el curso con id: {}", cursoId);
+        if (cursoId < 1) {
+            throw new InvalidInputException("ID de curso inválido: " + cursoId);
         }
-
-        // Ejemplo de respuesta estática. Este sería el lugar para realizar la consulta en base de datos.
-        return List.of(
-                new LeccionDTO(1, "Lección 1", "Descripción de lección 1", idCurso),
-                new LeccionDTO(2, "Lección 2", "Descripción de lección 2", idCurso)
-        );
+        // Simulación: si cursoId es 999, se simula que no hay lecciones
+        if (cursoId == 999) {
+            throw new NotFoundException("No se encontraron lecciones para el curso con id: " + cursoId);
+        }
+        List<LeccionDTO> lecciones = new ArrayList<>();
+        lecciones.add(new LeccionDTO(1, "Introducción", "Conceptos básicos de la lección", cursoId));
+        lecciones.add(new LeccionDTO(2, "Desarrollo", "Contenido en profundidad de la lección", cursoId));
+        return lecciones;
     }
 
-    @Operation(summary = "Obtener una lección específica", description = "Recupera una lección específica por su ID.")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Lección encontrada correctamente."),
-        @ApiResponse(responseCode = "400", description = "ID de lección inválido."),
-        @ApiResponse(responseCode = "404", description = "No se encontró lección con el ID especificado.") })
-    @GetMapping(value = "/{id}", produces = "application/json")
-    public LeccionDTO getLeccion(@Parameter(description = "ID de la lección a obtener", required = true) 
-                                  @PathVariable int id) {
-        LOGGER.info("Obteniendo lección con ID: {}", id);
-
+    @Operation(summary = "Obtener una lección específica", 
+               description = "Retorna la lección identificada por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lección obtenida correctamente",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class))),
+            @ApiResponse(responseCode = "400", description = "ID de lección inválido"),
+            @ApiResponse(responseCode = "404", description = "Lección no encontrada")
+    })
+    @GetMapping("/{id}")
+    public LeccionDTO getLeccionById(
+            @Parameter(description = "ID de la lección a obtener", required = true)
+            @PathVariable int id) {
+        LOGGER.info("Obteniendo lección con id: {}", id);
         if (id < 1) {
             throw new InvalidInputException("ID de lección inválido: " + id);
         }
-
-        // Respuesta estática para la lección. En producción aquí se realizaría una búsqueda real.
-        return new LeccionDTO(id, "Lección " + id, "Descripción de lección " + id, 1);
+        // Simulación: si id es 999 se simula que la lección no existe
+        if (id == 999) {
+            throw new NotFoundException("No se encontró lección con id: " + id);
+        }
+        return new LeccionDTO(id, "Lección Dummy " + id, "Descripción dummy de la lección " + id, 101);
     }
 
-    @Operation(summary = "Crear una nueva lección", description = "Registra una nueva lección.")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Lección creada correctamente."),
-        @ApiResponse(responseCode = "400", description = "Error en la creación de la lección.") })
+    @Operation(summary = "Crear una nueva lección", 
+               description = "Crea y retorna la lección creada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lección creada correctamente",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos para la lección")
+    })
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public LeccionDTO createLeccion(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la lección a crear", 
-                                                                                        required = true) 
-                                    @RequestBody LeccionDTO body) {
-        LOGGER.debug("createLeccion: body lección: {}", body);
-
-        // En este punto se realizaría la lógica para guardar la lección en la base de datos.
-        return body;
+    public LeccionDTO createLeccion(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Datos de la lección a crear",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class)))
+            @Valid @RequestBody LeccionDTO leccion) {
+        LOGGER.debug("Creando lección: {}", leccion);
+        // Simulación: asignar un ID dummy (por ejemplo, 100) a la lección creada.
+        leccion.setId(100);
+        return leccion;
     }
 
-
-
-    @Operation(summary = "Editar una lección", description = "Actualiza los datos de una lección existente.")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Lección actualizada correctamente."),
-        @ApiResponse(responseCode = "400", description = "ID de lección inválido."),
-        @ApiResponse(responseCode = "404", description = "No se encontró lección con el ID especificado.") })
+    @Operation(summary = "Actualizar una lección", 
+               description = "Actualiza y retorna la lección editada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lección actualizada correctamente",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos para la actualización"),
+            @ApiResponse(responseCode = "404", description = "Lección no encontrada")
+    })
     @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
-    public LeccionDTO editLeccion(@Parameter(description = "ID de la lección a editar", required = true) 
-                                  @PathVariable int id,
-                                  @Valid @RequestBody LeccionDTO body) {
-        LOGGER.debug("editLeccion: editando lección con ID: {}", id);
-
+    public LeccionDTO updateLeccion(
+            @Parameter(description = "ID de la lección a actualizar", required = true)
+            @PathVariable int id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Datos de la lección a actualizar",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeccionDTO.class)))
+            @Valid @RequestBody LeccionDTO leccion) {
+        LOGGER.debug("Actualizando lección con id: {}", id);
         if (id < 1) {
             throw new InvalidInputException("ID de lección inválido: " + id);
         }
-
-        // Aquí realizaríamos la lógica de actualización de la lección.
-        return new LeccionDTO(id, body.getNombre(), body.getDescripcion(), body.getCursoId());
+        if (id == 999) {
+            throw new NotFoundException("No se encontró lección con id: " + id);
+        }
+        // Simulación: asignar el ID recibido al objeto y retornar la lección actualizada.
+        leccion.setId(id);
+        return leccion;
     }
 
-    @Operation(summary = "Eliminar una lección", description = "Elimina una lección por su ID.")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Lección eliminada correctamente."),
-        @ApiResponse(responseCode = "400", description = "ID de lección inválido."),
-        @ApiResponse(responseCode = "404", description = "No se encontró lección con el ID especificado.") })
-    @DeleteMapping(value = "/{id}")
-    public void deleteLeccion(@Parameter(description = "ID de la lección a eliminar", required = true) 
-                              @PathVariable int id) {
-        LOGGER.debug("deleteLeccion: eliminando lección con ID: {}", id);
-
+    @Operation(summary = "Eliminar una lección", 
+               description = "Elimina la lección con el ID especificado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lección eliminada correctamente"),
+            @ApiResponse(responseCode = "400", description = "ID de lección inválido"),
+            @ApiResponse(responseCode = "404", description = "Lección no encontrada")
+    })
+    @DeleteMapping("/{id}")
+    public void deleteLeccion(
+            @Parameter(description = "ID de la lección a eliminar", required = true)
+            @PathVariable int id) {
+        LOGGER.debug("Eliminando lección con id: {}", id);
         if (id < 1) {
             throw new InvalidInputException("ID de lección inválido: " + id);
         }
-
-        // Aquí se eliminaría la lección o se marcaría como eliminada (borrado lógico).
-        LOGGER.info("Lección con ID: {} eliminada", id);
+        if (id == 999) {
+            throw new NotFoundException("No se encontró lección con id: " + id);
+        }
+        // Simulación: se procede a eliminar la lección.
     }
 }
