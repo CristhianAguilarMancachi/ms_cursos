@@ -34,10 +34,17 @@ public class OpenApiConfig {
     @Value("${api.common.contact.email}")
     String apiContactEmail;
 
-    /**
-     
-Will exposed on $HOST:$PORT/swagger-ui.html*
-@return the common OpenAPI documentation*/@Bean
-public OpenAPI getOpenApiDocumentation() {
-    return new OpenAPI().info(new Info().title(apiTitle).description(apiDescription).version(apiVersion).contact(new Contact().name(apiContactName).url(apiContactUrl).email(apiContactEmail)).termsOfService(apiTermsOfService).license(new License().name(apiLicense).url(apiLicenseUrl))).externalDocs(new ExternalDocumentation().description(apiExternalDocDesc).url(apiExternalDocUrl));}
+/**
+	 * Will exposed on $HOST:$PORT/swagger-ui.html
+	 *
+	 * @return the common OpenAPI documentation
+	 */
+	@Bean
+	public OpenAPI getOpenApiDocumentation() {
+		return new OpenAPI()
+				.info(new Info().title(apiTitle).description(apiDescription).version(apiVersion)
+						.contact(new Contact().name(apiContactName).url(apiContactUrl).email(apiContactEmail))
+						.termsOfService(apiTermsOfService).license(new License().name(apiLicense).url(apiLicenseUrl)))
+				.externalDocs(new ExternalDocumentation().description(apiExternalDocDesc).url(apiExternalDocUrl));
+	}
 }
